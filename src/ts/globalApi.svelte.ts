@@ -768,6 +768,7 @@ async function fetchWithProxy(url: string, arg: GlobalFetchArgs): Promise<Global
             "risu-header": encodeURIComponent(JSON.stringify(arg.headers)),
             "risu-url": encodeURIComponent(url),
             "Content-Type": arg.body instanceof URLSearchParams ? "application/x-www-form-urlencoded" : "application/json",
+            "Cache-Control": "no-cache",
             ...(arg.useRisuToken && { "x-risu-tk": "use" }),
             ...(DBState?.db?.requestLocation && { "risu-location": DBState.db.requestLocation }),
         };
@@ -1583,17 +1584,12 @@ export async function fetchNative(url: string, arg: {
 
         const r = await fetch(hubURL + `/proxy2`, {
             body: realBody as any,
-            headers: arg.useRisuTk ? {
+            headers: {
                 "risu-header": encodeURIComponent(JSON.stringify(headers)),
                 "risu-url": encodeURIComponent(url),
                 "Content-Type": "application/json",
-                "x-risu-tk": "use",
-                ...(isNodeServer && localStorage.getItem('risuauth') ? { "risu-auth": localStorage.getItem('risuauth') } : {}),
-                ...(DBState?.db?.requestLocation && { "risu-location": DBState.db.requestLocation }),
-            } : {
-                "risu-header": encodeURIComponent(JSON.stringify(headers)),
-                "risu-url": encodeURIComponent(url),
-                "Content-Type": "application/json",
+                "Cache-Control": "no-cache",
+                ...(arg.useRisuTk && { "x-risu-tk": "use" }),
                 ...(isNodeServer && localStorage.getItem('risuauth') ? { "risu-auth": localStorage.getItem('risuauth') } : {}),
                 ...(DBState?.db?.requestLocation && { "risu-location": DBState.db.requestLocation }),
             },
